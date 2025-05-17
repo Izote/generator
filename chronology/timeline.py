@@ -29,7 +29,7 @@ class Timeline:
         self.__count = count()
         self.__format = __class__.__default_format
         self.__value = next(self.__count)
-        self.event = [None]
+        self.event = []
         
     
     def __setitem__(self, key: int, item: Event | list[Event]) -> None:
