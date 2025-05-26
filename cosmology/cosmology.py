@@ -1,8 +1,12 @@
+from __future__ import annotations
+from typing import TYPE_CHECKING
 from numpy import absolute, append
 from numpy.random import default_rng, random_sample
 from scipy.stats import skewnorm
 from cosmology.element import Luminary
 
+if TYPE_CHECKING:
+    from numpy import ndarray
 
 class Cosmology:
     """
@@ -19,6 +23,9 @@ class Cosmology:
     luminary : list[Luminary]
         The Luminary instances important to this Cosmology.
     
+    number : list[int]
+        Numbers with some irreal significance to this Cosmology.
+    
     """
     def __init__(self, seed: int | None = None) -> None:
         if seed is None:
@@ -29,15 +36,20 @@ class Cosmology:
         self.rng = default_rng(seed=self.__seed)
         
         self.luminary = self.__generate_luminaries()
-    
+        self.color = [luminary["color"] for luminary 
+                      in list(filter(lambda l: l["visible"], self.luminary))]
+        
+        self.number = [len(list(filter(lambda l: l["visible"], self.luminary)))]
+          
     def __repr__(self) -> str:
-        return "{}(seed={}, luminary={})".format(
+        return "{}(luminary={}, color={}, number={})".format(
             self.__class__.__name__,
-            self.__seed,
-            self.count("luminary")
+            self.count("luminary"),
+            self.color,
+            self.number
         )
     
-    def __generate_luminaries(self):
+    def __generate_luminaries(self) -> list[Luminary]:
         """Randomized Luminary generation"""
         n = self.rng.integers(1, 13, 1)[0]
 
@@ -46,9 +58,9 @@ class Cosmology:
         dist.sort()
 
         n += 1
+
         vis = dist <= 9.5
-        rgb = [self.rng.integers(0, 255, size=3, endpoint=True) 
-               for _ in range(n)]
+        rgb = self.rng.integers(0, 255, size=(n, 3), endpoint=True)
 
         return [Luminary(distance=dist[i], visible=vis[i], color=rgb[i])
                 for i in range(n)]
