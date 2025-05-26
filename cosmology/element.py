@@ -1,3 +1,6 @@
+from re import match
+
+
 class Element:
     """Any individual Element within a Cosmology.
 
@@ -10,16 +13,40 @@ class Element:
 
     """
     def __init__(self, **associations) -> None:
-        self.__association = associations
+        for k, v in associations.items():
+            setattr(self, k, v)
     
     def __repr__(self) -> str:
-        association = [f"{k}='{v}'" if isinstance(v, str) else f"{k}={v}" 
-                       for k, v in self.__association.items()]
+        def not_dunder(x):
+            return match("^_", x) is None
         
-        return f"{self.__class__.__name__}({', '.join(association)})"
+        def is_data_type(x):
+            return any([
+                isinstance(x, str),
+                isinstance(x, int),
+                isinstance(x, float),
+                isinstance(x, bool)
+                ])
+        
+        attribute = dir(self)
+        if "name" in attribute:
+            other = filter(lambda x: x != "name" and not_dunder(x), attribute)
+            key = ["name"] + list(other)
+        else:
+            key = [k for k in attribute if not_dunder(k)]
+        
+        value = [getattr(self, k) for k in key]
+        index = [i for i in range(len(value)) if is_data_type(value[i])]
+
+        text = []
+        for i in index:
+            template = "{}='{}'" if isinstance(value[i], str) else "{}={}"
+            text.append(template.format(key[i], value[i]))
+        
+        return f"{self.__class__.__name__}({', '.join(text)})"
     
     def __getitem__(self, key: str) -> str | int | float | None:
-        return self.__association[key]
+        return getattr(self, key)
     
     def __setitem__(self, key, value) -> None:
-        self.__association[key] = value
+        setattr(self, key, value)
