@@ -20,14 +20,6 @@ class Element:
         def not_dunder(x):
             return match("^_", x) is None
         
-        def is_data_type(x):
-            return any([
-                isinstance(x, str),
-                isinstance(x, int),
-                isinstance(x, float),
-                isinstance(x, bool)
-                ])
-        
         attribute = dir(self)
         if "name" in attribute:
             other = filter(lambda x: x != "name" and not_dunder(x), attribute)
@@ -36,7 +28,7 @@ class Element:
             key = [k for k in attribute if not_dunder(k)]
         
         value = [getattr(self, k) for k in key]
-        index = [i for i in range(len(value)) if is_data_type(value[i])]
+        index = [i for i in range(len(value)) if not callable(value[i])]
 
         text = []
         for i in index:
