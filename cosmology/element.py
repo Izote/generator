@@ -1,10 +1,17 @@
+from __future__ import annotations
+from typing import TYPE_CHECKING
 from re import match
+from numpy import ndarray
+
+if TYPE_CHECKING:
+    from numpy import ndarray
 
 
 class Element:
-    """Any individual Element within a Cosmology.
+    """
+    Any individual Element within a Cosmology.
 
-    Attributes
+    Parameters
     ----------
     **associations :
         Assign any irreal associations to the Element via keyword arguments.
@@ -42,3 +49,24 @@ class Element:
     
     def __setitem__(self, key, value) -> None:
         setattr(self, key, value)
+
+
+class Luminary(Element):
+    """
+    Any Luminary (e.g., sun, moon, star, planet, etc.) within a Cosmology.
+
+    Parameters
+    ----------
+    distance : float
+        How far the Luminary is from the Sun in Astronomical units (AU). The
+        Sun itself will be at `distance=0.0`.
+
+    visible : bool
+        Whether the Luminary is visible to the naked eye.
+
+    color : ndarray
+        A 3-element array describing the Luminary's visible color as RGB values.
+    
+    """
+    def __init__(self, distance: float, visible: bool, color: ndarray) -> None:
+        super().__init__(distance=distance, visible=visible, color=color)
