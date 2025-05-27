@@ -64,9 +64,9 @@ class Luminary(Element):
     visible : bool
         Whether the Luminary is visible to the naked eye.
 
-    color : ndarray
+    rgb : ndarray
         A 3-element array describing the Luminary's visible color as RGB values.
     
     """
-    def __init__(self, distance: float, visible: bool, color: ndarray) -> None:
-        super().__init__(distance=distance, visible=visible, color=color)
+    def __init__(self, distance: float, visible: bool, rgb: ndarray) -> None:
+        super().__init__(distance=distance, visible=visible, rgb=rgb)

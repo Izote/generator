@@ -36,16 +36,12 @@ class Cosmology:
         self.rng = default_rng(seed=self.__seed)
         
         self.luminary = self.__generate_luminaries()
-        self.color = [luminary["color"] for luminary 
-                      in list(filter(lambda l: l["visible"], self.luminary))]
-        
         self.number = [len(list(filter(lambda l: l["visible"], self.luminary)))]
           
     def __repr__(self) -> str:
-        return "{}(luminary={}, color={}, number={})".format(
+        return "{}(luminary={}, number={})".format(
             self.__class__.__name__,
             self.count("luminary"),
-            self.color,
             self.number
         )
     
@@ -62,7 +58,7 @@ class Cosmology:
         vis = dist <= 9.5
         rgb = self.rng.integers(0, 255, size=(n, 3), endpoint=True)
 
-        return [Luminary(distance=dist[i], visible=vis[i], color=rgb[i])
+        return [Luminary(distance=dist[i], visible=vis[i], rgb=rgb[i])
                 for i in range(n)]
 
     @property
