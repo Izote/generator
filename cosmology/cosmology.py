@@ -1,6 +1,6 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
-from numpy import absolute, append
+from numpy import absolute, append, array
 from numpy.random import default_rng, random_sample
 from scipy.stats import skewnorm
 from cosmology.element import Luminary
@@ -23,7 +23,7 @@ class Cosmology:
     luminary : list[Luminary]
         The Luminary instances important to this Cosmology.
     
-    number : list[int]
+    number : ndarray[int]
         Numbers with some irreal significance to this Cosmology.
     
     """
@@ -36,12 +36,12 @@ class Cosmology:
         self.rng = default_rng(seed=self.__seed)
         
         self.luminary = self.__generate_luminaries()
-        self.number = [len(list(filter(lambda l: l["visible"], self.luminary)))]
+        self.number = self.__generate_number()
           
     def __repr__(self) -> str:
         return "{}(luminary={}, number={})".format(
             self.__class__.__name__,
-            self.count("luminary"),
+            self.count_attribute("luminary"),
             self.number
         )
     
@@ -60,23 +60,63 @@ class Cosmology:
 
         return [Luminary(distance=dist[i], visible=vis[i], rgb=rgb[i])
                 for i in range(n)]
+    
+    def __generate_number(self) -> ndarray:
+        visible = len(list(filter(lambda l: l["visible"], self.luminary)))
+        
+        return array([visible])
 
     @property
     def seed(self) -> int:
         """Read-only access to the instance's `seed` attribute."""
         return self.__seed
+    
+    def add_number(self, n: int) -> None:
+        """Add a new number to this instance.
 
-    def count(self, element: str) -> int:
-        """Return the count of Elements in this instance.
+        Parameters
+        ----------
+        n : int
+            The desired number that will be added to this instance.
+        
+        Returns
+        -------
+        None
+
+        """
+        self.number = append(self.number, n)
+    
+    def remove_number(self, n: int) -> None:
+        """Remove a number from this instance
+        
+        Parameters
+        ----------
+        n : int
+            The desired number to remove from this instance.
+        
+        Returns
+        -------
+        None
+
+        """
+        self.number = self.number[self.number != n]
+
+    def count_attribute(self, attribute: str) -> int:
+        """Return the count of the desired attribute in this instance.
 
         Parameters
         ----------
         element: str
-            The name of the desired Element.
+            The name of the desired attribute.
 
         Returns
         -------
         int
             The number of Elements present in the instance.
         """
-        return len(getattr(self, element.lower()))
+        attr = getattr(self, attribute.lower())
+
+        if isinstance(attr, list):
+            return len(attr)
+        else:
+            return attr.shape[0]

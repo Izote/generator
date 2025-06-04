@@ -1,7 +1,8 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
 from re import match
-from numpy import ndarray
+from numpy import array, where
+from numpy.linalg import norm
 
 if TYPE_CHECKING:
     from numpy import ndarray
@@ -69,4 +70,18 @@ class Luminary(Element):
     
     """
     def __init__(self, distance: float, visible: bool, rgb: ndarray) -> None:
-        super().__init__(distance=distance, visible=visible, rgb=rgb)
+        super().__init__(
+            distance=distance,
+            visible=visible,
+            rgb=rgb,
+            color=self.__describe_rgb(rgb)
+            )
+    
+    def __describe_rgb(self, rgb: ndarray) -> str:
+        name = ["red","green","blue"]
+        value = array([[255, 0, 0],[0, 255, 0],[0, 0, 255]])
+
+        distance = norm(value - rgb, axis=1)
+        closest = where(distance == distance.min())[0][0]
+        
+        return name[closest]
