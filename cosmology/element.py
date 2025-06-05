@@ -68,6 +68,20 @@ class Luminary(Element):
     rgb : ndarray
         A 3-element array describing the Luminary's visible color as RGB values.
     
+    Attributes
+    ----------
+    distance : float
+        This Luminary's distance from its Sun in astronomical units (AU).
+    
+    visible : bool
+        Whether this Luminary is visible with the naked eye.
+    
+    rgb : ndarray
+        The RGB color value this Luminary appears as in the night sky.
+    
+    color : str
+        A text description of the Luminary's RGB color.
+    
     """
     def __init__(self, distance: float, visible: bool, rgb: ndarray) -> None:
         super().__init__(
@@ -78,8 +92,10 @@ class Luminary(Element):
             )
     
     def __describe_rgb(self, rgb: ndarray) -> str:
-        name = ["red","green","blue"]
-        value = array([[255, 0, 0],[0, 255, 0],[0, 0, 255]])
+        """Describe a rgb value array as a string."""
+        name = ["orange", "red", "green", "blue", "white"]
+        value = array([[255, 165, 0],[255, 0, 0],[0, 255, 0],[0, 0, 255],
+                       [255, 255, 255]])
 
         distance = norm(value - rgb, axis=1)
         closest = where(distance == distance.min())[0][0]

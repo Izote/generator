@@ -20,6 +20,9 @@ class Cosmology:
     
     Attributes
     ----------
+    seed : int
+        The integer seed used for this instance and its members.
+
     luminary : list[Luminary]
         The Luminary instances important to this Cosmology.
     
@@ -34,7 +37,7 @@ class Cosmology:
             self.__seed = seed
         
         self.rng = default_rng(seed=self.__seed)
-        
+    
         self.luminary = self.__generate_luminaries()
         self.number = self.__generate_number()
           
@@ -46,22 +49,32 @@ class Cosmology:
         )
     
     def __generate_luminaries(self) -> list[Luminary]:
-        """Randomized Luminary generation"""
-        n = self.rng.integers(1, 13, 1)[0]
+        """Generate a list of Luminary objects."""
+        n, scale = self.rng.integers(4, 16, 2)
 
-        dist = skewnorm.rvs(2, size=n, scale=15, random_state=self.rng)
-        dist = absolute(append(dist, [0])).round(2)
+        # Appending a {0, 1} values to stand-in for Sol, Earth respectively.
+        dist = skewnorm.rvs(2, size=n, scale=scale, random_state=self.rng)
+        dist = append(dist, [0.00])
+        
+        if 1.00 not in dist:
+            dist = append(dist, [1.00])
+        
+        dist = absolute(dist).round(2)
         dist.sort()
 
         n += 1
 
         vis = dist <= 9.5
+
+        # Forcing 0th element to be orange, keeping with theme.
         rgb = self.rng.integers(0, 255, size=(n, 3), endpoint=True)
+        rgb[0] = array([255, 165, 0])
 
         return [Luminary(distance=dist[i], visible=vis[i], rgb=rgb[i])
                 for i in range(n)]
     
     def __generate_number(self) -> ndarray:
+        """Generate an initial array of important numbers."""
         visible = len(list(filter(lambda l: l["visible"], self.luminary)))
         
         return array([visible])
@@ -72,7 +85,7 @@ class Cosmology:
         return self.__seed
     
     def add_number(self, n: int) -> None:
-        """Add a new number to this instance.
+        """Add a significant number to this instance.
 
         Parameters
         ----------
@@ -87,7 +100,7 @@ class Cosmology:
         self.number = append(self.number, n)
     
     def remove_number(self, n: int) -> None:
-        """Remove a number from this instance
+        """Remove a significant number from this instance.
         
         Parameters
         ----------
@@ -102,7 +115,7 @@ class Cosmology:
         self.number = self.number[self.number != n]
 
     def count_attribute(self, attribute: str) -> int:
-        """Return the count of the desired attribute in this instance.
+        """Count of the items within the desired attribute.
 
         Parameters
         ----------
@@ -112,7 +125,7 @@ class Cosmology:
         Returns
         -------
         int
-            The number of Elements present in the instance.
+            The number of items present in the selected attribute.
         """
         attr = getattr(self, attribute.lower())
 
